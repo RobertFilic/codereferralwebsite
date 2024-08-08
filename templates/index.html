@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Referral Code Exchange - Home{% endblock %}
+
+{% block header %}Welcome to Referral Code Exchange{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Retrieve a Referral Code</h5>
+                <p class="card-text">Get a random referral code and save on your next purchase!</p>
+                <a href="{{ url_for('retrieve_code_page') }}" class="btn btn-success">Get Code</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-body">
+                <h5 class="card-title">Add a Referral Code</h5>
+                <p class="card-text">Share your referral codes with others. Help the community grow!</p>
+                <a href="{{ url_for('add_code') }}" class="btn btn-primary">Add Code</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">About Referral Code Exchange</h5>
+                <p class="card-text">
+                    Referral Code Exchange is a platform where users can share and retrieve referral codes for various services. 
+                    By using these codes, you can get discounts or bonuses on different platforms. 
+                    Help others by sharing your codes, and benefit from codes shared by the community!
+                </p>
+                <a href="{{ url_for('view_codes') }}" class="btn btn-info">View All Codes</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

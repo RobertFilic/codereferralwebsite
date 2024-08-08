@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}View Referral Codes{% endblock %}
+
+{% block header %}View Referral Codes{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label for="service-filter" class="form-label">Filter by Service</label>
+        <select class="form-select" id="service-filter">
+            <option value="">All Services</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="validity-filter" class="form-label">Filter by Validity</label>
+        <select class="form-select" id="validity-filter">
+            <option value="">All</option>
+            <option value="1">Valid</option>
+            <option value="0">Invalid</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">&nbsp;</label>
+        <button id="apply-filters" class="btn btn-primary d-block">Apply Filters</button>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Service</th>
+            <th>Created At</th>
+            <th>Valid Until</th>
+            <th>Description</th>
+            <th>Is Valid</th>
+        </tr>
+    </thead>
+    <tbody id="codes-table-body">
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadServices() {
+        const response = await fetch('/services');
+        const services = await response.json();
+        const serviceSelect = document.getElementById('service-filter');
+        services.forEach(service => {
+            const option = document.createElement('option');
+            option.value = service.id;
+            option.textContent = service.name;
+            serviceSelect.appendChild(option);
+        });
+    }
+
+    async function loadCodes() {
+        const serviceId = document.getElementById('service-filter').value;
+        const validity = document.getElementById('validity-filter').value;
+        const response = await fetch(`/codes?service_id=${serviceId}&is_valid=${validity}`);
+        const codes = await response.json();
+        const tableBody = document.getElementById('codes-table-body');
+        tableBody.innerHTML = '';
+        codes.forEach(code => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${code.id}</td>
+                <td>${code.code}</td>
+                <td>${code.service}</td>
+                <td>${new Date(code.created_at).toLocaleString()}</td>
+                <td>${new Date(code.valid_until).toLocaleString()}</td>
+                <td>${code.description}</td>
+                <td>${code.is_valid ? 'Yes' : 'No'}</td>
+            `;
+        });
+    }
+
+    document.getElementById('apply-filters').addEventListener('click', loadCodes);
+
+    loadServices();
+    loadCodes();
+</script>
+{% endblock %}

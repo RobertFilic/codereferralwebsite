@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Add Referral Code{% endblock %}
+
+{% block header %}Add Referral Code{% endblock %}
+
+{% block content %}
+<form id="add-code-form">
+    <div class="mb-3">
+        <label for="code" class="form-label">Referral Code</label>
+        <input type="text" class="form-control" id="code" required>
+    </div>
+    <div class="mb-3">
+        <label for="service" class="form-label">Service</label>
+        <select class="form-select" id="service" required>
+            <option value="">Select a service</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="duration" class="form-label">Duration (days)</label>
+        <input type="number" class="form-control" id="duration" value="30" required>
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Code</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadServices() {
+        const response = await fetch('/services');
+        const services = await response.json();
+        const serviceSelect = document.getElementById('service');
+        services.forEach(service => {
+            const option = document.createElement('option');
+            option.value = service.id;
+            option.textContent = service.name;
+            serviceSelect.appendChild(option);
+        });
+    }
+
+    document.getElementById('add-code-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const code = document.getElementById('code').value;
+        const serviceId = document.getElementById('service').value;
+        const duration = document.getElementById('duration').value;
+        const description = document.getElementById('description').value;
+
+        try {
+            const response = await fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code, service_id: serviceId, duration, description }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                showNotification(data.message);
+                this.reset();
+            } else {
+                showNotification(data.error, true);
+            }
+        } catch (error) {
+            showNotification('An error occurred while submitting the code.', true);
+        }
+    });
+
+    loadServices();
+</script>
+{% endblock %}

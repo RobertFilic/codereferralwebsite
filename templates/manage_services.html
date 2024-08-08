@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Services{% endblock %}
+
+{% block header %}Manage Services{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <h2>Add New Service</h2>
+        <form id="add-service-form">
+            <div class="mb-3">
+                <label for="service-name" class="form-label">Service Name</label>
+                <input type="text" class="form-control" id="service-name" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Service</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <h2>Existing Services</h2>
+        <ul id="service-list" class="list-group">
+            <!-- Services will be populated here -->
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadServices() {
+        const response = await fetch('/services');
+        const services = await response.json();
+        const serviceList = document.getElementById('service-list');
+        serviceList.innerHTML = '';
+        services.forEach(service => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = service.name;
+            serviceList.appendChild(li);
+        });
+    }
+
+    document.getElementById('add-service-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const serviceName = document.getElementById('service-name').value;
+        const response = await fetch('/add_service', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: serviceName }),
+        });
+        const result = await response.json();
+        if (response.ok) {
+            showNotification(result.message);
+            this.reset();
+            loadServices();
+        } else {
+            showNotification(result.error, true);
+        }
+    });
+
+    loadServices();
+</script>
+{% endblock %}
